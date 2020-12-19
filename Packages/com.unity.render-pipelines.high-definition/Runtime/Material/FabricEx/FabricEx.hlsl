@@ -154,6 +154,9 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
 
     bsdfData.ambientOcclusion = surfaceData.ambientOcclusion;
 
+    bsdfData.sheen = surfaceData.sheen;
+    bsdfData.metallic = surfaceData.metallic;
+
     // Note: we have ZERO_INITIALIZE the struct so bsdfData.anisotropy == 0.0
     // Note: DIFFUSION_PROFILE_NEUTRAL_ID is 0
 
@@ -410,11 +413,10 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
         // We don't use Fresnel term for CharlieD
         float3 F = bsdfData.fresnel0;
 
-		specTerm = F * Vis * D *0.0;
-	
-		diffTerm = FabricLambert(bsdfData.roughnessT);// *0.0;
+        specTerm = F * Vis * D;
 
-		
+        diffTerm = FabricLambert(bsdfData.roughnessT);
+
     }
     else // MATERIALFEATUREFLAGS_FabricEx_SILK
     {
@@ -442,6 +444,7 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
         // but now maybe we want to revisit it for transmission
         diffTerm = DisneyDiffuse(clampedNdotV, abs(NdotL), LdotV, bsdfData.perceptualRoughness);
     }
+
     // The compiler should optimize these. Can revisit later if necessary.
     cbsdf.diffR = diffTerm * clampedNdotL;
     cbsdf.diffT = diffTerm * flippedNdotL;

@@ -30,6 +30,7 @@
 #define DEBUGVIEW_FABRICEX_SURFACEDATA_TANGENT (1313)
 #define DEBUGVIEW_FABRICEX_SURFACEDATA_ANISOTROPY (1314)
 #define DEBUGVIEW_FABRICEX_SURFACEDATA_SHEEN (1315)
+#define DEBUGVIEW_FABRICEX_SURFACEDATA_METALLIC (1316)
 
 //
 // UnityEngine.Rendering.HighDefinition.FabricEx+BSDFData:  static fields
@@ -55,6 +56,7 @@
 #define DEBUGVIEW_FABRICEX_BSDFDATA_ROUGHNESS_B (1368)
 #define DEBUGVIEW_FABRICEX_BSDFDATA_ANISOTROPY (1369)
 #define DEBUGVIEW_FABRICEX_BSDFDATA_SHEEN (1370)
+#define DEBUGVIEW_FABRICEX_BSDFDATA_METALLIC (1371)
 
 // Generated from UnityEngine.Rendering.HighDefinition.FabricEx+SurfaceData
 // PackingRules = Exact
@@ -74,6 +76,7 @@ struct SurfaceData
     float3 tangentWS;
     float anisotropy;
     float sheen;
+    float metallic;
 };
 
 // Generated from UnityEngine.Rendering.HighDefinition.FabricEx+BSDFData
@@ -99,6 +102,7 @@ struct BSDFData
     float roughnessB;
     float anisotropy;
     float sheen;
+    float metallic;
 };
 
 //
@@ -157,6 +161,9 @@ void GetGeneratedSurfaceDataDebug(uint paramId, SurfaceData surfacedata, inout f
             break;
         case DEBUGVIEW_FABRICEX_SURFACEDATA_SHEEN:
             result = surfacedata.sheen.xxx;
+            break;
+        case DEBUGVIEW_FABRICEX_SURFACEDATA_METALLIC:
+            result = surfacedata.metallic.xxx;
             break;
     }
 }
@@ -231,6 +238,9 @@ void GetGeneratedBSDFDataDebug(uint paramId, BSDFData bsdfdata, inout float3 res
             break;
         case DEBUGVIEW_FABRICEX_BSDFDATA_SHEEN:
             result = bsdfdata.sheen.xxx;
+            break;
+        case DEBUGVIEW_FABRICEX_BSDFDATA_METALLIC:
+            result = bsdfdata.metallic.xxx;
             break;
     }
 }

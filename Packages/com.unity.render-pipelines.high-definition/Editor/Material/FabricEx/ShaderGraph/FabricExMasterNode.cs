@@ -91,6 +91,9 @@ namespace UnityEditor.Rendering.HighDefinition
         public const int SheenSlotId = 21;
         public const string SheenSlotName = "Sheen";
 
+        public const int MetallicSlotId = 22;
+        public const string MetallicSlotName = "Metallic";
+
         public enum MaterialType
         {
             CottonWool,
@@ -132,10 +135,11 @@ namespace UnityEditor.Rendering.HighDefinition
             VertexNormal = 1 << VertexNormalSlotId,
             VertexTangent = 1 << VertexTangentSlotId,
             Sheen = 1 << SheenSlotId,
+            Metallic = 1 << MetallicSlotId,
         }
 
-        const SlotMask CottonWoolSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen;
-        const SlotMask SilkSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Tangent | SlotMask.Anisotropy | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen;
+        const SlotMask CottonWoolSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.Metallic;
+        const SlotMask SilkSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Tangent | SlotMask.Anisotropy | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.Metallic;
 
         // This could also be a simple array. For now, catch any mismatched data.
         SlotMask GetActiveSlotMask()
@@ -653,6 +657,13 @@ namespace UnityEditor.Rendering.HighDefinition
             {
                 AddSlot(new Vector1MaterialSlot(SheenSlotId, SheenSlotName, SheenSlotName, SlotType.Input, 1.0f, ShaderStageCapability.Fragment));
                 validSlots.Add(SheenSlotId);
+            }
+
+            // Metallic
+            if (MaterialTypeUsesSlotMask(SlotMask.Metallic))
+            {
+                AddSlot(new Vector1MaterialSlot(MetallicSlotId, MetallicSlotName, MetallicSlotName, SlotType.Input, 0.0f, ShaderStageCapability.Fragment));
+                validSlots.Add(MetallicSlotId);
             }
 
             if (MaterialTypeUsesSlotMask(SlotMask.BakedGI) && overrideBakedGI.isOn)

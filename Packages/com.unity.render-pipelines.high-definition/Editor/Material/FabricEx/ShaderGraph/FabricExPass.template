@@ -1,6 +1,6 @@
 Pass
 {
-    // based on FabricExPass.template
+    // based on FabricExxPass.template
     Name "$splice(PassName)"
     Tags { "LightMode" = "$splice(LightMode)" }
 
@@ -253,6 +253,7 @@ Pass
         $SurfaceDescription.Thickness:                  surfaceData.thickness =                 surfaceDescription.Thickness;
         $SurfaceDescription.Anisotropy:                 surfaceData.anisotropy =                surfaceDescription.Anisotropy;
         $SurfaceDescription.Sheen:                      surfaceData.sheen =                     surfaceDescription.Sheen;
+        $SurfaceDescription.Metallic:                   surfaceData.metallic =                  surfaceDescription.Metallic;
 
         // These static material feature allow compile time optimization
         surfaceData.materialFeatures = 0;
