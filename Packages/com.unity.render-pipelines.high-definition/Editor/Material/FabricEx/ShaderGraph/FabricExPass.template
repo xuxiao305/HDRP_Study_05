@@ -252,6 +252,7 @@ Pass
         $SurfaceDescription.SubsurfaceMask:             surfaceData.subsurfaceMask =            surfaceDescription.SubsurfaceMask;
         $SurfaceDescription.Thickness:                  surfaceData.thickness =                 surfaceDescription.Thickness;
         $SurfaceDescription.Anisotropy:                 surfaceData.anisotropy =                surfaceDescription.Anisotropy;
+        $SurfaceDescription.Sheen:                      surfaceData.sheen =                     surfaceDescription.Sheen;
 
         // These static material feature allow compile time optimization
         surfaceData.materialFeatures = 0;
