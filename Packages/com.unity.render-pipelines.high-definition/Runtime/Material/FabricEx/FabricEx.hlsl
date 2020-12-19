@@ -156,6 +156,7 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
 
     bsdfData.sheen = surfaceData.sheen;
     bsdfData.metallic = surfaceData.metallic;
+    bsdfData.sss = surfaceData.sss;
 
     // Note: we have ZERO_INITIALIZE the struct so bsdfData.anisotropy == 0.0
     // Note: DIFFUSION_PROFILE_NEUTRAL_ID is 0
@@ -394,12 +395,15 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     float NdotL = dot(N, L);
     float clampedNdotV = ClampNdotV(NdotV);
     float clampedNdotL = saturate(NdotL);
-    float flippedNdotL = ComputeWrappedDiffuseLighting(-NdotL, TRANSMISSION_WRAP_LIGHT);
+    // float flippedNdotL = ComputeWrappedDiffuseLighting(-NdotL, TRANSMISSION_WRAP_LIGHT);
+
+    float wrappedClampedNdotL = ComputeWrappedDiffuseLighting(NdotL, bsdfData.sss * 0.5);
+    float flippedNdotL = 0;//ComputeWrappedDiffuseLighting(-NdotL, bsdfData.sss * 0.5);
 
     float LdotV, NdotH, LdotH, invLenLV;
     GetBSDFAngle(V, L, NdotL, NdotV, LdotV, NdotH, LdotH, invLenLV);
 
-    float  diffTerm;
+    float3 diffTerm;
     float3 specTerm;
 
     if (HasFlag(bsdfData.materialFeatures, MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL))
@@ -416,6 +420,9 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
         specTerm = F * Vis * D;
 
         diffTerm = FabricLambert(bsdfData.roughnessT);
+
+        float3 scatterColor = bsdfData.diffuseColor * bsdfData.diffuseColor;
+        diffTerm = lerp(diffTerm, diffTerm * saturate(scatterColor + saturate(NdotL)), bsdfData.sss);
 
     }
     else // MATERIALFEATUREFLAGS_FabricEx_SILK
@@ -446,12 +453,13 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     }
 
     // The compiler should optimize these. Can revisit later if necessary.
-    cbsdf.diffR = diffTerm * clampedNdotL;
+    cbsdf.diffR = diffTerm * wrappedClampedNdotL;
     cbsdf.diffT = diffTerm * flippedNdotL;
 
     // Probably worth branching here for perf reasons.
     // This branch will be optimized away if there's no transmission (as NdotL > 0 is tested in IsNonZeroBSDF())
     // And we hope the compile will move specTerm in the branch in case of transmission (TODO: verify as we FabricEx this may not be true as we already have branch above...)
+    // this is very doubtful... as the specular is changing highly freqenlty..
     if (NdotL > 0)
     {
         cbsdf.specR = specTerm * clampedNdotL;
