@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c442cd75783b64283e30cff5a7d377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EnvironmentLibraryGUID: 8207661abcec23b4aa55dfd7bae7721d
+  m_CameraSynced: 1
+  <layout>k__BackingField:
+    viewLayout: 0
+    lastFocusedView: 0
+    showedSidePanel: 0
+    gizmoState:
+      <center>k__BackingField: {x: -0.6518519, y: -0.13703704}
+      <angle>k__BackingField: 1.2355591
+      <length>k__BackingField: 0.30395767
+      <blendFactor>k__BackingField: -1
+  m_Views:
+  - <camera>k__BackingField:
+      <pivot>k__BackingField: {x: 0, y: 0, z: 0}
+      <rotation>k__BackingField: {x: -0.012982444, y: 0.9867679, z: 0.124994956, w: 0.10247748}
+      <viewSize>k__BackingField: 1.4805944
+    m_EnvironmentGUID: 8207661abcec23b4aa55dfd7bae7721d,-7454624798139871771
+    viewedObjectAssetGUID: 
+    viewedObjecHierarchytInstanceID: 0
+  - <camera>k__BackingField:
+      <pivot>k__BackingField: {x: 0, y: 0, z: 0}
+      <rotation>k__BackingField: {x: -0.012982444, y: 0.9867679, z: 0.124994956, w: 0.10247748}
+      <viewSize>k__BackingField: 1.4805944
+    m_EnvironmentGUID: 8207661abcec23b4aa55dfd7bae7721d,-6656027947710614321
+    viewedObjectAssetGUID: 
+    viewedObjecHierarchytInstanceID: 0
