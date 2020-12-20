@@ -146,6 +146,7 @@ namespace UnityEditor.Rendering.HighDefinition
         const SlotMask SilkSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Tangent | SlotMask.Anisotropy | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.Metallic | SlotMask.SSS;
 
         // This could also be a simple array. For now, catch any mismatched data.
+        // XX: I removed this to combine cotton and silk
         SlotMask GetActiveSlotMask()
         {
             switch (materialType)
@@ -160,6 +161,10 @@ namespace UnityEditor.Rendering.HighDefinition
                     return SlotMask.None;
             }
         }
+        //SlotMask GetActiveSlotMask()
+        //{
+        //    return SlotMask.None;
+        //}
 
         bool MaterialTypeUsesSlotMask(SlotMask mask)
         {
@@ -629,11 +634,11 @@ namespace UnityEditor.Rendering.HighDefinition
             }
 
             // Anisotropy
-            if (MaterialTypeUsesSlotMask(SlotMask.Anisotropy))
-            {
+            //if (MaterialTypeUsesSlotMask(SlotMask.Anisotropy))
+            //{
                 AddSlot(new Vector1MaterialSlot(AnisotropySlotId, AnisotropySlotName, AnisotropySlotName, SlotType.Input, 0.8f, ShaderStageCapability.Fragment));
                 validSlots.Add(AnisotropySlotId);
-            }
+            //}
 
             // Emission Normal
             if (MaterialTypeUsesSlotMask(SlotMask.Emission))

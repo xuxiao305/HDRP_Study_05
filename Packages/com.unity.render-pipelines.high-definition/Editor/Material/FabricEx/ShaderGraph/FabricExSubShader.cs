@@ -620,18 +620,19 @@ namespace UnityEditor.Rendering.HighDefinition
                 }
             }
 
-            switch (masterNode.materialType)
-            {
-                case FabricExMasterNode.MaterialType.CottonWool:
-                    baseActiveFields.Add("Material.CottonWool");
-                    break;
-                case FabricExMasterNode.MaterialType.Silk:
-                    baseActiveFields.Add("Material.Silk");
-                    break;
-                default:
-                    UnityEngine.Debug.LogError("Unknown material type: " + masterNode.materialType);
-                    break;
-            }
+            // XX: I removed this part to combine the cotton and silk together
+            //switch (masterNode.materialType)
+            //{
+            //    case FabricExMasterNode.MaterialType.CottonWool:
+            //        baseActiveFields.Add("Material.CottonWool");
+            //        break;
+            //    case FabricExMasterNode.MaterialType.Silk:
+            //        baseActiveFields.Add("Material.Silk");
+            //        break;
+            //    default:
+            //        UnityEngine.Debug.LogError("Unknown material type: " + masterNode.materialType);
+            //        break;
+            //}
 
             if (masterNode.alphaTest.isOn)
             {

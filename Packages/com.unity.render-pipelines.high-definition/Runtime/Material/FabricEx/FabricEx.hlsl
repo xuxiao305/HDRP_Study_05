@@ -25,7 +25,7 @@
 
 float4 GetDiffuseOrDefaultColor(BSDFData bsdfData, float replace)
 {
-	return float4(bsdfData.diffuseColor, 0.0);
+    return float4(bsdfData.diffuseColor, 0.0);
 }
 
 float3 GetNormalForShadowBias(BSDFData bsdfData)
@@ -147,6 +147,10 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
     bsdfData.materialFeatures = surfaceData.materialFeatures;
 
     bsdfData.diffuseColor = surfaceData.baseColor;
+    float metallic = surfaceData.metallic;
+    // bsdfData.diffuseColor = ComputeDiffuseColor(surfaceData.baseColor, metallic);
+    // bsdfData.fresnel0     = ComputeFresnel0(surfaceData.baseColor, metallic, DEFAULT_SPECULAR_VALUE);
+
     bsdfData.specularOcclusion = surfaceData.specularOcclusion;
     bsdfData.normalWS = surfaceData.normalWS;
     bsdfData.geomNormalWS = surfaceData.geomNormalWS;
@@ -179,10 +183,10 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
         FillMaterialTransmission(bsdfData.diffusionProfileIndex, surfaceData.thickness, bsdfData);
     }
 
-    if (!HasFlag(surfaceData.materialFeatures, MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL))
-    {
+    // if (!HasFlag(surfaceData.materialFeatures, MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL))
+    // {
         FillMaterialAnisotropy(surfaceData.anisotropy, surfaceData.tangentWS, cross(surfaceData.normalWS, surfaceData.tangentWS), bsdfData);
-    }
+    // }
 
     // After the fill material SSS data has operated, in the case of the FabricEx we force the value of the fresnel0 term
     bsdfData.fresnel0 = surfaceData.specularColor;
@@ -289,6 +293,7 @@ PreLightData GetPreLightData(float3 V, PositionInputs posInput, inout BSDFData b
     float3 iblN;
 
     // Reminder: This is a static if resolve at compile time
+    // XX: How to combine this into 1 ?
     if (!HasFlag(bsdfData.materialFeatures, MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL))
     {
         GetPreIntegratedFGDGGXAndDisneyDiffuse(NdotV, preLightData.iblPerceptualRoughness, bsdfData.fresnel0, preLightData.specularFGD, preLightData.diffuseFGD, unused);
@@ -390,7 +395,6 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     ZERO_INITIALIZE(CBSDF, cbsdf);
 
     float3 N = bsdfData.normalWS;
-
     float NdotV = preLightData.NdotV;
     float NdotL = dot(N, L);
     float clampedNdotV = ClampNdotV(NdotV);
@@ -403,67 +407,66 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     float LdotV, NdotH, LdotH, invLenLV;
     GetBSDFAngle(V, L, NdotL, NdotV, LdotV, NdotH, LdotH, invLenLV);
 
-    float3 diffTerm;
-    float3 specTerm;
+    float3 diffTermCottonWool; float3 specTermCottonWool; float3 FCootonWool;
+    float3 diffTermSilk; float3 specTermSilk; float3 FSilk;
 
-    if (HasFlag(bsdfData.materialFeatures, MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL))
-    {
-        float D = D_Charlie(NdotH, bsdfData.roughnessT);
-        // V_Charlie is expensive, use approx with V_Ashikhmin instead
-        // float Vis = V_Charlie(NdotL, clampedNdotV, bsdfData.roughness);
-        float Vis = V_Ashikhmin(NdotL, clampedNdotV);
+    ////////////// Cotton and Wool //////////////
+    float D = D_Charlie(NdotH, bsdfData.roughnessT);
+    // V_Charlie is expensive, use approx with V_Ashikhmin instead
+    // float Vis = V_Charlie(NdotL, clampedNdotV, bsdfData.roughness);
+    float Vis = V_Ashikhmin(NdotL, clampedNdotV);
 
-        // FabricEx are dieletric but we simulate forward scattering effect with colored specular (fuzz tint term)
-        // We don't use Fresnel term for CharlieD
-        float3 F = bsdfData.fresnel0;
+    // FabricEx are dieletric but we simulate forward scattering effect with colored specular (fuzz tint term)
+    // We don't use Fresnel term for CharlieD
+    FCootonWool = bsdfData.fresnel0;
 
-        specTerm = F * Vis * D;
+    specTermCottonWool = FCootonWool * Vis * D;
 
-        diffTerm = FabricLambert(bsdfData.roughnessT);
+    diffTermCottonWool = INV_PI;//FabricLambert(bsdfData.roughnessT);
 
-        float3 scatterColor = bsdfData.diffuseColor * bsdfData.diffuseColor;
-        diffTerm = lerp(diffTerm, diffTerm * saturate(scatterColor + saturate(NdotL)), bsdfData.sss);
+    float3 scatterColor = bsdfData.diffuseColor * bsdfData.diffuseColor;
+    diffTermCottonWool = lerp(diffTermCottonWool, diffTermCottonWool * saturate(scatterColor + saturate(NdotL)), bsdfData.sss);
 
-    }
-    else // MATERIALFEATUREFLAGS_FabricEx_SILK
-    {
-        // For silk we just use a tinted anisotropy
-        float3 H = (L + V) * invLenLV;
+    ////////////// Silk BRDF //////////////
+    // For silk we just use a tinted anisotropy
+    float3 H = (L + V) * invLenLV;
 
-        // For anisotropy we must not saturate these values
-        float TdotH = dot(bsdfData.tangentWS, H);
-        float TdotL = dot(bsdfData.tangentWS, L);
-        float BdotH = dot(bsdfData.bitangentWS, H);
-        float BdotL = dot(bsdfData.bitangentWS, L);
+    // For anisotropy we must not saturate these values
+    float TdotH = dot(bsdfData.tangentWS, H);
+    float TdotL = dot(bsdfData.tangentWS, L);
+    float BdotH = dot(bsdfData.bitangentWS, H);
+    float BdotL = dot(bsdfData.bitangentWS, L);
 
-        // TODO: Do comparison between this correct version and the one from isotropic and see if there is any visual difference
-        // We use abs(NdotL) to handle the none case of double sided
-        float DV = DV_SmithJointGGXAniso(   TdotH, BdotH, NdotH, clampedNdotV, TdotL, BdotL, abs(NdotL),
-                                            bsdfData.roughnessT, bsdfData.roughnessB, preLightData.partLambdaV);
+    // TODO: Do comparison between this correct version and the one from isotropic and see if there is any visual difference
+    // We use abs(NdotL) to handle the none case of double sided
+    float DV = DV_SmithJointGGXAniso(   TdotH, BdotH, NdotH, clampedNdotV, TdotL, BdotL, abs(NdotL),
+                                        bsdfData.roughnessT, bsdfData.roughnessB, preLightData.partLambdaV);
 
-        // FabricEx are dieletric but we simulate forward scattering effect with colored specular (fuzz tint term)
-        float3 F = F_Schlick(bsdfData.fresnel0, LdotH);
+    // FabricEx are dieletric but we simulate forward scattering effect with colored specular (fuzz tint term)
+    FSilk = F_Schlick(bsdfData.fresnel0, LdotH);
 
-        specTerm = F * DV;
+    specTermSilk = FSilk * DV;
 
-        // Use abs NdotL to evaluate diffuse term also for transmission
-        // TODO: See with Evgenii about the clampedNdotV here. This is what we use before the refactor
-        // but now maybe we want to revisit it for transmission
-        diffTerm = DisneyDiffuse(clampedNdotV, abs(NdotL), LdotV, bsdfData.perceptualRoughness);
-    }
+    // Use abs NdotL to evaluate diffuse term also for transmission
+    // TODO: See with Evgenii about the clampedNdotV here. This is what we use before the refactor
+    // but now maybe we want to revisit it for transmission
+    diffTermSilk = DisneyDiffuse(clampedNdotV, abs(NdotL), LdotV, bsdfData.perceptualRoughness);
 
+    ////////////// Combine 2 BRDFs //////////////
     // The compiler should optimize these. Can revisit later if necessary.
-    cbsdf.diffR = diffTerm * wrappedClampedNdotL;
-    cbsdf.diffT = diffTerm * flippedNdotL;
-
+    // cbsdf.diffR = lerp(diffTermCottonWool, diffTermSilk, bsdfData.metallic) * wrappedClampedNdotL;
+    cbsdf.diffR = diffTermCottonWool * wrappedClampedNdotL;
+    cbsdf.diffT = diffTermCottonWool * flippedNdotL;
+  
     // Probably worth branching here for perf reasons.
     // This branch will be optimized away if there's no transmission (as NdotL > 0 is tested in IsNonZeroBSDF())
     // And we hope the compile will move specTerm in the branch in case of transmission (TODO: verify as we FabricEx this may not be true as we already have branch above...)
-    // this is very doubtful... as the specular is changing highly freqenlty..
-    if (NdotL > 0)
-    {
-        cbsdf.specR = specTerm * clampedNdotL;
-    }
+    // XX: I feel this is very doubtful as the specular is changing highly freqenlty..
+    // if (NdotL > 0)
+    // {
+        cbsdf.specR = lerp(specTermCottonWool, specTermSilk, bsdfData.metallic) * clampedNdotL;
+        cbsdf.specR = specTermSilk;
+    // }
 
     // We don't multiply by 'bsdfData.diffuseColor' here. It's done only once in PostEvaluateBSDF().
     return cbsdf;
