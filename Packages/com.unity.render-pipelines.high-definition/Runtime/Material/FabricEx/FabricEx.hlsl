@@ -45,7 +45,7 @@ void FillMaterialAnisotropy(float anisotropy, float3 tangentWS, float3 bitangent
     bsdfData.tangentWS = tangentWS;
     bsdfData.bitangentWS = bitangentWS;
 }
-
+    
 // This function is use to help with debugging and must be implemented by any lit material
 // Implementer must take into account what are the current override component and
 // adjust SurfaceData properties accordingdly
@@ -393,6 +393,9 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
 {
     CBSDF cbsdf;
     ZERO_INITIALIZE(CBSDF, cbsdf);
+    cbsdf.diffR = 0.1;
+    cbsdf.diffT = 0.1;
+    cbsdf.specR = 0.1;
 
     float3 N = bsdfData.normalWS;
     float NdotV = preLightData.NdotV;
@@ -454,19 +457,9 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
 
     ////////////// Combine 2 BRDFs //////////////
     // The compiler should optimize these. Can revisit later if necessary.
-    // cbsdf.diffR = lerp(diffTermCottonWool, diffTermSilk, bsdfData.metallic) * wrappedClampedNdotL;
     cbsdf.diffR = diffTermCottonWool * wrappedClampedNdotL;
     cbsdf.diffT = diffTermCottonWool * flippedNdotL;
-  
-    // Probably worth branching here for perf reasons.
-    // This branch will be optimized away if there's no transmission (as NdotL > 0 is tested in IsNonZeroBSDF())
-    // And we hope the compile will move specTerm in the branch in case of transmission (TODO: verify as we FabricEx this may not be true as we already have branch above...)
-    // XX: I feel this is very doubtful as the specular is changing highly freqenlty..
-    // if (NdotL > 0)
-    // {
-        cbsdf.specR = lerp(specTermCottonWool, specTermSilk, bsdfData.metallic) * clampedNdotL;
-        cbsdf.specR = specTermSilk;
-    // }
+    cbsdf.specR = lerp(specTermSilk, specTermCottonWool, bsdfData.sheen) * clampedNdotL;
 
     // We don't multiply by 'bsdfData.diffuseColor' here. It's done only once in PostEvaluateBSDF().
     return cbsdf;

@@ -260,10 +260,10 @@ Pass
         surfaceData.materialFeatures = 0;
 
         // Transform the preprocess macro into a material feature (note that silk flag is deduced from the abscence of this one)
-#ifdef _MATERIAL_FEATURE_COTTON_WOOL
-        surfaceData.materialFeatures |= MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL;
-        $SurfaceDescription.Smoothness:                 surfaceData.perceptualSmoothness =      lerp(0.0, 0.6, surfaceDescription.Smoothness);
-#endif
+// #ifdef _MATERIAL_FEATURE_COTTON_WOOL
+//         surfaceData.materialFeatures |= MATERIALFEATUREFLAGS_FABRIC_EX_COTTON_WOOL;
+//         $SurfaceDescription.Smoothness:                 surfaceData.perceptualSmoothness =      lerp(0.0, 0.6, surfaceDescription.Smoothness);
+// #endif
 
 #ifdef _MATERIAL_FEATURE_SUBSURFACE_SCATTERING
         surfaceData.materialFeatures |= MATERIALFEATUREFLAGS_FABRIC_EX_SUBSURFACE_SCATTERING;
