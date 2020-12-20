@@ -869,6 +869,7 @@ namespace UnityEditor.Rendering.HighDefinition
                 --EditorGUI.indentLevel;
             }
 
+            // It's HDRP Asset Setting (Not the Default One...)\Material
             EditorGUILayout.PropertyField(serialized.renderPipelineSettings.lightLoopSettings.supportFabricConvolution, Styles.supportFabricBSDFConvolutionContent);
 
             diffusionProfileUI.drawElement = DrawDiffusionProfileElement;
