@@ -408,7 +408,7 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     // float flippedNdotL = ComputeWrappedDiffuseLighting(-NdotL, TRANSMISSION_WRAP_LIGHT);
 
     float wrappedClampedNdotL = ComputeWrappedDiffuseLighting(NdotL, bsdfData.sss * 0.5);
-    float flippedNdotL = 0;//ComputeWrappedDiffuseLighting(-NdotL, bsdfData.sss * 0.5);
+    float flippedNdotL = ComputeWrappedDiffuseLighting(-NdotL, bsdfData.sss * 0.5);
 
     float LdotV, NdotH, LdotH, invLenLV;
     GetBSDFAngle(V, L, NdotL, NdotV, LdotV, NdotH, LdotH, invLenLV);
