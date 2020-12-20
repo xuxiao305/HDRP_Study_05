@@ -78,6 +78,10 @@ namespace UnityEngine.Rendering.HighDefinition
             [SurfaceDataAttributes("Sheen")]
             public float sheen;
 
+            // Sheen Color
+            [SurfaceDataAttributes("SheenColor")]
+            public Vector3 sheenColor;
+
             // Metallic
             [SurfaceDataAttributes("Metallic")]
             public float metallic;
@@ -132,6 +136,7 @@ namespace UnityEngine.Rendering.HighDefinition
             public float roughnessB;
             public float anisotropy;
             public float sheen;
+            public Vector3 sheenColor;
             public float metallic;
             public float sss;
         };

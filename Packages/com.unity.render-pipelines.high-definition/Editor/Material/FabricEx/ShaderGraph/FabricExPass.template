@@ -253,6 +253,7 @@ Pass
         $SurfaceDescription.Thickness:                  surfaceData.thickness =                 surfaceDescription.Thickness;
         $SurfaceDescription.Anisotropy:                 surfaceData.anisotropy =                surfaceDescription.Anisotropy;
         $SurfaceDescription.Sheen:                      surfaceData.sheen =                     surfaceDescription.Sheen;
+        $SurfaceDescription.SheenColor:                 surfaceData.sheenColor =                surfaceDescription.SheenColor;
         $SurfaceDescription.Metallic:                   surfaceData.metallic =                  surfaceDescription.Metallic;
         $SurfaceDescription.SSS:                        surfaceData.sss =                       surfaceDescription.SSS;
 

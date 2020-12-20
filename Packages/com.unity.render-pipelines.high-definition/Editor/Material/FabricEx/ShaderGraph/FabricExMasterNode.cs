@@ -91,10 +91,13 @@ namespace UnityEditor.Rendering.HighDefinition
         public const int SheenSlotId = 21;
         public const string SheenSlotName = "Sheen";
 
-        public const int MetallicSlotId = 22;
+        public const int SheenColorSlotId = 22;
+        public const string SheenColorSlotName = "SheenColor";
+
+        public const int MetallicSlotId = 23;
         public const string MetallicSlotName = "Metallic";
 
-        public const int SSSSlotId = 23;
+        public const int SSSSlotId = 24;
         public const string SSSSlotName = "SSS";
 
         public enum MaterialType
@@ -138,12 +141,13 @@ namespace UnityEditor.Rendering.HighDefinition
             VertexNormal = 1 << VertexNormalSlotId,
             VertexTangent = 1 << VertexTangentSlotId,
             Sheen = 1 << SheenSlotId,
+            SheenColor = 1 << SheenColorSlotId,
             Metallic = 1 << MetallicSlotId,
             SSS = 1 << SSSSlotId,
         }
 
-        const SlotMask CottonWoolSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.Metallic | SlotMask.SSS;
-        const SlotMask SilkSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Tangent | SlotMask.Anisotropy | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.Metallic | SlotMask.SSS;
+        const SlotMask CottonWoolSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.SheenColor | SlotMask.Metallic | SlotMask.SSS;
+        const SlotMask SilkSlotMask = SlotMask.Position | SlotMask.Albedo | SlotMask.SpecularOcclusion | SlotMask.Normal | SlotMask.Smoothness | SlotMask.Occlusion | SlotMask.Specular | SlotMask.DiffusionProfile | SlotMask.SubsurfaceMask | SlotMask.Thickness | SlotMask.Tangent | SlotMask.Anisotropy | SlotMask.Emission | SlotMask.Alpha | SlotMask.AlphaClipThreshold | SlotMask.BentNormal | SlotMask.BakedGI | SlotMask.DepthOffset | SlotMask.VertexNormal | SlotMask.VertexTangent | SlotMask.Sheen | SlotMask.SheenColor | SlotMask.Metallic | SlotMask.SSS;
 
         // This could also be a simple array. For now, catch any mismatched data.
         // XX: I removed this to combine cotton and silk
@@ -667,7 +671,12 @@ namespace UnityEditor.Rendering.HighDefinition
                 AddSlot(new Vector1MaterialSlot(SheenSlotId, SheenSlotName, SheenSlotName, SlotType.Input, 1.0f, ShaderStageCapability.Fragment));
                 validSlots.Add(SheenSlotId);
             }
-
+            // Sheen Color
+            if (MaterialTypeUsesSlotMask(SlotMask.SheenColor))
+            {
+                AddSlot(new ColorRGBMaterialSlot(SheenColorSlotId, SheenColorSlotName, SheenColorSlotName, SlotType.Input, Color.black, ColorMode.Default, ShaderStageCapability.Fragment));
+                validSlots.Add(SheenColorSlotId);
+            }
             // Metallic
             if (MaterialTypeUsesSlotMask(SlotMask.Metallic))
             {

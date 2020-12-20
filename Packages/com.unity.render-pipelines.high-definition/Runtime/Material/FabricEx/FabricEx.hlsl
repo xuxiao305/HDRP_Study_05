@@ -159,6 +159,8 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
     bsdfData.ambientOcclusion = surfaceData.ambientOcclusion;
 
     bsdfData.sheen = surfaceData.sheen;
+    bsdfData.sheenColor = surfaceData.sheenColor;
+
     bsdfData.metallic = surfaceData.metallic;
     bsdfData.sss = surfaceData.sss;
 
@@ -189,7 +191,7 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
     // }
 
     // After the fill material SSS data has operated, in the case of the FabricEx we force the value of the fresnel0 term
-    bsdfData.fresnel0 = surfaceData.specularColor;
+    bsdfData.fresnel0 = lerp(surfaceData.specularColor, surfaceData.sheenColor, surfaceData.sheen);
 
     // roughnessT and roughnessB are clamped, and are meant to be used with punctual and directional lights.
     // perceptualRoughness is not clamped, and is meant to be used for IBL.
@@ -419,7 +421,7 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
     ////////////// Cotton and Wool //////////////
     float D = D_Charlie(NdotH, bsdfData.roughnessT);
     // V_Charlie is expensive, use approx with V_Ashikhmin instead
-    // float Vis = V_Charlie(NdotL, clampedNdotV, bsdfData.roughness);
+    // float Vis = V_Charlie(NdotL, clampedNdotV, bsdfData.roughnessT);
     float Vis = V_Ashikhmin(NdotL, clampedNdotV);
 
     // FabricEx are dieletric but we simulate forward scattering effect with colored specular (fuzz tint term)
