@@ -190,6 +190,7 @@ void LightLoop( float3 V, PositionInputs posInput, PreLightData preLightData, BS
                 // TODO: this will cause us to load from the normal buffer first. Does this cause a performance problem?
                 float3 L = -light.forward;
 
+                // XX: Temporalily remove the cutting for the wrap ndotl 
                 // Is it worth sampling the shadow map?
                 if ((light.lightDimmer > 0) && (light.shadowDimmer > 0) && // Note: Volumetric can have different dimmer, thus why we test it here
                     IsNonZeroBSDF(V, L, preLightData, bsdfData) &&

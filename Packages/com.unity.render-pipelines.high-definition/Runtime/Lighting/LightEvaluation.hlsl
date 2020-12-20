@@ -244,6 +244,9 @@ DirectionalShadowType EvaluateShadow_Directional(LightLoopContext lightLoopConte
     DirectionalShadowType shadow = 1.0;
     float shadowMask = 1.0;
     float NdotL      = dot(N, -light.forward); // Disable contact shadow and shadow mask when facing away from light (i.e transmission)
+    // XX: Temporaly revmoe the NdotL as it cut the the wrappedNdotL
+    // XX: Note -1 = Outside Shadow / 1 = In Shadow
+    NdotL = 1;
 
 #ifdef SHADOWS_SHADOWMASK
     // shadowMaskSelector.x is -1 if there is no shadow mask
@@ -253,6 +256,7 @@ DirectionalShadowType EvaluateShadow_Directional(LightLoopContext lightLoopConte
 
     if ((light.shadowIndex >= 0) && (light.shadowDimmer > 0))
     {
+        // XX: This is where the shadow map coming from
         shadow = lightLoopContext.shadowValue;
 
     #ifdef SHADOWS_SHADOWMASK

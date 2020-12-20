@@ -18,6 +18,8 @@ float GetDirectionalShadowAttenuation(HDShadowContext shadowContext, float2 posi
 {
     // If NdotL < 0, we flip the normal in case it is used for the transmission to correctly bias shadow position
     normalWS *= FastSign(dot(normalWS, L));
+    // XX: Remove for wrap diffuse
+    normalWS = 1.0;
 #if defined(SHADOW_LOW) || defined(SHADOW_MEDIUM)
     return EvalShadow_CascadedDepth_Dither(shadowContext, _ShadowmapCascadeAtlas, s_linear_clamp_compare_sampler, positionSS, positionWS, normalWS, shadowDataIndex, L);
 #else

@@ -58,7 +58,6 @@ DirectLighting ShadeSurface_Infinitesimal(PreLightData preLightData, BSDFData bs
         lighting.diffuse = lightColor * saturate(dot(bsdfData.normalWS, L));
     }
 #endif
-
     return lighting;
 }
 
@@ -80,7 +79,8 @@ DirectLighting ShadeSurface_Directional(LightLoopContext lightLoopContext,
     if ((light.lightDimmer > 0) && IsNonZeroBSDF(V, L, preLightData, bsdfData))
     {
         float4 lightColor = EvaluateLight_Directional(lightLoopContext, posInput, light);
-        lightColor.rgb *= lightColor.a * 1.0; // Composite
+        lightColor.rgb *= lightColor.a; // Composite
+
 
 #ifdef MATERIAL_INCLUDE_TRANSMISSION
         if (ShouldEvaluateThickObjectTransmission(V, L, preLightData, bsdfData, light.shadowIndex))
@@ -93,9 +93,12 @@ DirectLighting ShadeSurface_Directional(LightLoopContext lightLoopContext,
 #endif
         {
             DirectionalShadowType shadow = EvaluateShadow_Directional(lightLoopContext, posInput, light, builtinData, GetNormalForShadowBias(bsdfData));
-            float NdotL  = dot(bsdfData.normalWS, L); // No microshadowing when facing away from light (use for thin transmission as well)
-            shadow *= NdotL >= 0.0 ? ComputeMicroShadowing(GetAmbientOcclusionForMicroShadowing(bsdfData), NdotL, _MicroShadowOpacity) : 1.0;
+            // XX: Temporalily remove the micro shadow as it's using NdotL which cut the WrapedNdotL
+            // XX: Ideally we would the NdotL attunation pass from the shader type itself, so it can be properly wrapped, etc
+            // float NdotL  = dot(bsdfData.normalWS, L); // No microshadowing when facing away from light (use for thin transmission as well)
+            // shadow *= NdotL >= 0.0 ? ComputeMicroShadowing(GetAmbientOcclusionForMicroShadowing(bsdfData), NdotL, _MicroShadowOpacity) : 1.0;
             lightColor.rgb *= ComputeShadowColor(shadow, light.shadowTint, light.penumbraTint);
+
         }
 
         // Simulate a sphere/disk light with this hack.
@@ -198,7 +201,6 @@ DirectLighting ShadeSurface_Punctual(LightLoopContext lightLoopContext,
         // (means if we disable the optimization it will not have the
         // same result) but we don't care as it is a hack anyway.
         ClampRoughness(preLightData, bsdfData, light.minRoughness);
-
         lighting = ShadeSurface_Infinitesimal(preLightData, bsdfData, V, L, lightColor.rgb,
                                               light.diffuseDimmer, light.specularDimmer);
     }
