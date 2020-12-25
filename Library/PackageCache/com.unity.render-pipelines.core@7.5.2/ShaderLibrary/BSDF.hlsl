@@ -330,7 +330,7 @@ real DV_SmithJointGGXAniso(real TdotH, real BdotH, real NdotH, real NdotV,
     real a2 = roughnessT * roughnessB;
     real3 v = real3(roughnessB * TdotH, roughnessT * BdotH, a2 * NdotH);
     real  s = dot(v, v);
-    
+
     real lambdaV = NdotL * partLambdaV;
     real lambdaL = NdotV * length(real3(roughnessT * TdotL, roughnessB * BdotL, NdotL));
 

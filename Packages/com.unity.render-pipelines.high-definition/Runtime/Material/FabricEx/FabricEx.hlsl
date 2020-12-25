@@ -398,9 +398,9 @@ CBSDF EvaluateBSDF(float3 V, float3 L, PreLightData preLightData, BSDFData bsdfD
 {
     CBSDF cbsdf;
     ZERO_INITIALIZE(CBSDF, cbsdf);
-    cbsdf.diffR = 0.1;
-    cbsdf.diffT = 0.1;
-    cbsdf.specR = 0.1;
+    cbsdf.diffR = 0.0;
+    cbsdf.diffT = 0.0;
+    cbsdf.specR = 0.0;
 
     float3 N = bsdfData.normalWS;
     float NdotV = preLightData.NdotV;
